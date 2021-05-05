@@ -29,7 +29,7 @@ def save_to_npz(file, des = ""):
     
     run("med2image -i " + file + " -o /images/slice")
     
-    folder = "images/"
+    folder = "images"
     files = sorted(listdir(folder))
     list = []
 
