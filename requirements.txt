@@ -1,4 +1,5 @@
-SimpleITK
-opencv-python
 matplotlib
-scikit-image
+keras
+git+https://www.github.com/keras-team/keras-contrib.git
+scipy==1.1.0
+opencv-python

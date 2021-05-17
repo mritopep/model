@@ -1,4 +1,0 @@
-download this folder
-https://www.dropbox.com/s/jbvcziczvp80nq8/files.zip?dl=0
-
-this includes test data and model
