@@ -13,4 +13,4 @@ mkdir img_data
 mkdir img_data/test
 mkdir img_data/train
 
-mkkdir saved_models
+mkdir saved_models
