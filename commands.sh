@@ -14,3 +14,4 @@ mkdir img_data/test
 mkdir img_data/train
 
 mkdir saved_models
+mkdir saved_epoch_models
