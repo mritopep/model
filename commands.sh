@@ -12,3 +12,5 @@ mkdir test_img/B
 mkdir img_data
 mkdir img_data/test
 mkdir img_data/train
+
+mkkdir saved_models
