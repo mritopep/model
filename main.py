@@ -1,5 +1,6 @@
 from pix2pix import Pix2Pix
 from os import path
+import sys
 
 if __name__ == "__main__":
     print("Initializing and loading model...")
@@ -8,7 +9,7 @@ if __name__ == "__main__":
     print("Starting training ...")
 
     # e is number of epochs. It should be increased to ~15 to 20 at least. 
-    e = 2
+    e = int(sys.argv[1]) if len(sys.argv) > 1 else 2
     gan.train(epochs=e, batch_size=1, include_val = False, step_print = 100)
     
     folder = "saved_models"
