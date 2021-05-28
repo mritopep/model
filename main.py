@@ -18,6 +18,6 @@ if __name__ == "__main__":
     
     gan.generator.save( path.join(folder, "gen_model_" + str(e) + ".h5") )
     gan.discriminator.save( path.join(folder, "disc_model_" + str(e) + ".h5") )
-    gan.combined.( path.join(folder, "gan_model_" + str(e) + ".h5") )
+    gan.combined.save( path.join(folder, "gan_model_" + str(e) + ".h5") )
     
     print("Models saved.")
