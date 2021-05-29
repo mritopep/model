@@ -79,10 +79,11 @@ class Gdrive:
             file = self.service.files().create(body=file_metadata,
                                           media_body=media,
                                           fields='id').execute()
+            print('File ID: %s' % file.get('id'))
         except HttpError:
             print('corrupted file')
             pass
-        print('File ID: %s' % file.get('id'))
+        
 
 
     def share(self, file_id, email):
