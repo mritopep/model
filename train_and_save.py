@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
             if(save_to_drive == 1):
                 make_archive(folder, os.path.join(
-                    "saved_epoch_models", f"{tag}_{str(epoch)}.zip"))
+                    "saved_epoch_models", f"{tag}_part_{str(epoch)}.zip"))
                 g.upload(os.path.join("saved_epoch_models",
                          f"{tag}_{str(epoch)}.zip"))
     else:
