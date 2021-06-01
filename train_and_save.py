@@ -68,6 +68,6 @@ if __name__ == "__main__":
     print("Models saved.")
 
     print("Models Uploading...")
-
-    make_archive(folder,f"{tag}_saved_models.zip")
-    g.upload(f"{tag}_saved_models.zip")
+    PWD = str(os.getcwd())
+    make_archive(os.path.join(PWD,"saved_models"),os.path.join(PWD, f"{tag}_saved_models.zip"))
+    g.upload(os.path.join(PWD, f"{tag}_saved_models.zip"))
