@@ -2,7 +2,7 @@ from __future__ import print_function, division
 import scipy
 
 from keras_contrib.layers.normalization.instancenormalization import InstanceNormalization
-from keras.layers import Input, Dense, Reshape, Flatten, Dropout, Concatenate, merge
+from keras.layers import Input, Dense, Reshape, Flatten, Dropout, Concatenate
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
@@ -14,8 +14,8 @@ import sys
 from data_loader import DataLoader
 import numpy as np
 import os
-from arch_util import gaussian_filter_block, attention
-import keras.backend as K
+from keras.layers import Subtract, Add
+from arch_util import gaussian_filter_block
 
 
 class Pix2Pix():
@@ -81,7 +81,7 @@ class Pix2Pix():
                 d = BatchNormalization(momentum=0.8)(d)
             return d
 
-        def deconv2d(layer_input, skip_input, filters, f_size=4, dropout_rate=0):
+        def deconv2d(layer_input, filters, f_size=4, dropout_rate=0, skip_input=None):
 
             u = UpSampling2D(size=2)(layer_input)
             u = Conv2D(filters, kernel_size=f_size, strides=1,
@@ -89,7 +89,7 @@ class Pix2Pix():
             if dropout_rate:
                 u = Dropout(dropout_rate)(u)
             u = BatchNormalization(momentum=0.8)(u)
-            if(skip_input):
+            if(skip_input != None):
                 u = Concatenate()([u, skip_input])
             return u
 
@@ -103,12 +103,12 @@ class Pix2Pix():
         d6 = conv2d(d5, self.gf*8, bn=True)  # 512
         d7 = conv2d(d6, self.gf*8, bn=True)  # 512
 
-        u1 = deconv2d(d7, d6, self.gf*8)  # 512
-        u2 = deconv2d(u1, d5, self.gf*16)  # 1024
-        u3 = deconv2d(u2, d4, self.gf*16)  # 1024
-        u4 = deconv2d(u3, d3, self.gf*8)  # 512
-        u5 = deconv2d(u4, d2, self.gf*4)  # 256
-        u6 = deconv2d(u5, d1, self.gf*2)  # 128
+        u1 = deconv2d(d7, self.gf*8, skip_input=d6)  # 512
+        u2 = deconv2d(u1, self.gf*16, skip_input=d5)  # 1024
+        u3 = deconv2d(u2, self.gf*16, skip_input=d4)  # 1024
+        u4 = deconv2d(u3, self.gf*8, skip_input=d3)  # 512
+        u5 = deconv2d(u4, self.gf*4, skip_input=d2)  # 256
+        u6 = deconv2d(u5, self.gf*2, skip_input=d1)  # 128
         u7 = UpSampling2D(size=2)(u6)
 
         output_img = Conv2D(self.channels, kernel_size=4,
@@ -116,33 +116,24 @@ class Pix2Pix():
 
         # Low frequency image generation
         lpf_k_1 = gaussian_filter_block(u4)
-        att_out = attention()(lpf_k_1)
-        u5_l = deconv2d(att_out, d2, self.gf*4)  # 256
-        u6_l = deconv2d(u5_l, d1, self.gf*2)  # 128
-        u7_l = UpSampling2D(size=2)(u7_l)
+        u5_l = deconv2d(lpf_k_1, self.gf*4)  # 256
+        u6_l = deconv2d(u5_l, self.gf*2)  # 128
+        u7_l = UpSampling2D(size=2)(u6_l)
         output_img_low_frequency = Conv2D(self.channels, kernel_size=4,
                                           strides=1, padding='same', activation='tanh')(u7_l)
 
         # High frequency image generation
         lpf_k_2 = gaussian_filter_block(u5)
-
-        def diffrence(x, y):
-            return x-y
-
-        def add(x, y):
-            return x+y
-
-        diff = merge([lpf_k_2, u5], mode=diffrence)
-        att_out = attention()(diff)
-        u6_h = deconv2d(att_out, d1, self.gf*2)  # 128
+        hpf_k_2 = Subtract()([lpf_k_2, u5])
+        u6_h = deconv2d(hpf_k_2, self.gf*2)  # 128
         u7_h = UpSampling2D(size=2)(u6_h)
         output_img_high_frequency = Conv2D(self.channels, kernel_size=4,
                                            strides=1, padding='same', activation='tanh')(u7_h)
 
         # combine
-        c1 = merge([output_img_low_frequency,
-                   output_img_high_frequency], mode=add)
-        c2 = merge([c1, output_img], mode=add)
+        c1 = Add()([output_img_low_frequency,
+                   output_img_high_frequency])
+        c2 = Add()([c1, output_img])
 
         return Model(d0, c2)
 

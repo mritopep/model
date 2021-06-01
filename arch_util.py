@@ -11,7 +11,7 @@ def gaussian_filter_block(input_layer,
                           dilation_rate=(1, 1),
                           padding="same",
                           activation=None,
-                          trainable=False,
+                          trainable=True,
                           use_bias=False):
     """
     Build a gaussian filter block
@@ -55,26 +55,68 @@ def gaussian_filter_block(input_layer,
         kernel_initializer=kernel_init)(input_layer)
 
 
-class attention(Layer):
-    def __init__(self, **kwargs):
-        super(attention, self).__init__(**kwargs)
+# class attention(Layer):
+#     def __init__(self, **kwargs):
+#         super(attention, self).__init__(**kwargs)
 
-    def build(self, input_shape):
-        self.W = self.add_weight(name="att_weight", shape=(
-            input_shape[-1], 1), initializer="normal")
-        self.b = self.add_weight(name="att_bias", shape=(
-            input_shape[1], 1), initializer="zeros")
-        super(attention, self).build(input_shape)
+#     def build(self, input_shape):
+#         self.W = self.add_weight(name="att_weight", shape=(
+#             input_shape[-1], 1), initializer="normal")
+#         self.b = self.add_weight(name="att_bias", shape=(
+#             input_shape[1], 1), initializer="zeros")
+#         super(attention, self).build(input_shape)
 
-    def call(self, x):
-        et = K.squeeze(K.tanh(K.dot(x, self.W)+self.b), axis=-1)
-        at = K.softmax(et)
-        at = K.expand_dims(at, axis=-1)
-        output = x*at
-        return K.sum(output, axis=1)
+#     def call(self, x):
+#         et = K.squeeze(K.tanh(K.dot(x, self.W)+self.b), axis=-1)
+#         at = K.softmax(et)
+#         at = K.expand_dims(at, axis=-1)
+#         output = x*at
+#         return K.sum(output, axis=1)
 
-    def compute_output_shape(self, input_shape):
-        return (input_shape[0], input_shape[-1])
+#     def compute_output_shape(self, input_shape):
+#         return (input_shape[0], input_shape[-1])
 
-    def get_config(self):
-        return super(attention, self).get_config()
+#     def get_config(self):
+#         return super(attention, self).get_config()
+
+# def get_config(self):
+#         return super(attention, self).get_config()
+    
+# def gaussian_glimpse(img_tensor, transform_params):
+#     # parse arguments
+#     h, w = (img_tensor.shape[1],img_tensor.shape[2])
+#     H, W = img_tensor.shape.as_list()[1:3]
+#     split_ax = transform_params.shape.ndims -1
+#     uy, sy, dy, ux, sx, dx = tf.split(transform_params, 6, split_ax)
+#     # create Gaussian masks, one for each axis
+#     Ay = gaussian_mask(uy, sy, dy, h, H)
+#     Ax = gaussian_mask(ux, sx, dx, w, W)
+#     # extract glimpse
+#     glimpse = tf.matmul(tf.matmul(Ay, img_tensor, adjoint_a=True), Ax)
+#     return glimpse
+
+# tx = tf.placeholder(tf.float32, x.shape, 'image')
+# tu = tf.placeholder(tf.float32, [1], 'u')
+# ts = tf.placeholder(tf.float32, [1], 's')
+# td = tf.placeholder(tf.float32, [1], 'd')
+
+# gaussian_att_params = tf.concat([tu, ts, td, tu, ts, td], -1)
+# gaussian_glimpse_expr = gaussian_glimpse(tx, gaussian_att_params, )
+
+# def gaussian_mask(u, s, d, R, C):
+#     """
+#     :param u: tf.Tensor, centre of the first Gaussian.
+#     :param s: tf.Tensor, standard deviation of Gaussians.
+#     :param d: tf.Tensor, shift between Gaussian centres.
+#     :param R: int, number of rows in the mask, there is one Gaussian per row.
+#     :param C: int, number of columns in the mask.
+#     """
+#     # indices to create centres
+#     R = tf.to_float(tf.reshape(tf.range(R), (1, 1, R)))
+#     C = tf.to_float(tf.reshape(tf.range(C), (1, C, 1)))
+#     centres = u[np.newaxis, :, np.newaxis] + R * d
+#     column_centres = C - centres
+#     mask = tf.exp(-.5 * tf.square(column_centres / s))
+#     # we add eps for numerical stability
+#     normalised_mask = mask / (tf.reduce_sum(mask, 1, keep_dims=True) + 1e-8)
+#     return normalised_mask
