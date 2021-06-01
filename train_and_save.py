@@ -7,6 +7,7 @@ from gdrive import Gdrive
 
 if __name__ == "__main__":
     tag = ""
+    PWD = str(os.getcwd())
 
     print("Initializing and loading model...")
     gan = Pix2Pix("img_data")
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     save_dataset = int(sys.argv[4]) if len(sys.argv) > 4 else 0
 
     # tag to distungiush
-    tag = str(sys.argv[5]) if len(sys.argv) > 5 else ""
+    tag = f"{str(sys.argv[5])}_{e}" if len(sys.argv) > 5 else ""
 
     if(save_dataset == 1):
         make_archive("img_data", f"{tag}_img_data.zip")
@@ -53,7 +54,7 @@ if __name__ == "__main__":
                 g.upload(os.path.join("saved_epoch_models",
                          f"{tag}_{str(epoch)}.zip"))
     else:
-        value =gan.train(epochs=e, batch_size=1, include_val=False, step_print=100)
+        value = gan.train(epochs=e, batch_size=1, include_val=False, step_print=100)
 
     folder = "saved_models"
 
@@ -64,3 +65,6 @@ if __name__ == "__main__":
     gan.combined.save(path.join(folder, "gan_model_" + str(e) + ".h5"))
 
     print("Models saved.")
+
+    make_archive(folder,f"{tag}_saved_models.zip")
+    g.upload(f"{tag}_saved_models.zip")
