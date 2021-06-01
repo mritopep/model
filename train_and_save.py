@@ -49,6 +49,7 @@ if __name__ == "__main__":
                 folder, "gan_model_" + str(epoch) + ".h5"))
 
             if(save_to_drive == 1):
+                print("Models Uploading...")
                 make_archive(folder, os.path.join(
                     "saved_epoch_models", f"{tag}_part_{str(epoch)}.zip"))
                 g.upload(os.path.join("saved_epoch_models",
@@ -65,6 +66,8 @@ if __name__ == "__main__":
     gan.combined.save(path.join(folder, "gan_model_" + str(e) + ".h5"))
 
     print("Models saved.")
+
+    print("Models Uploading...")
 
     make_archive(folder,f"{tag}_saved_models.zip")
     g.upload(f"{tag}_saved_models.zip")
