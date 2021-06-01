@@ -9,26 +9,20 @@ import numpy as np
 def pad_2d(data, r, c):
     res = np.zeros((r, c))
     m, n = data.shape
-
     res[(r-m)//2:(r-m)//2+m, (c-n)//2:(c-n)//2+n] = data
     return res
 
 
 def crop_2d(data, r, c):
     m, n = data.shape
-
     return data[(m-r)//2:(m-r)//2+r, (n-c)//2:(n-c)//2+c]
 
 
 def gamma_correction(image, gamma=0.15):
-
     invGamma = 1.0 / gamma
-
     table = np.array([((i / 255.0) ** invGamma) * 255
                       for i in np.arange(0, 256)]).astype("uint8")
-
     image = cv2.LUT(image, table).astype(np.uint8)
-
     return image
 
 
@@ -78,7 +72,7 @@ def pre_process(group, data_folder, img_folder, target_folder, filter_percentage
         t1 = path.join("A", str(g))
         t2 = path.join("B", str(g))
         g += 1
-        
+
         convert(mr_file, path.join(img_folder, t1))
         convert(pet_file, path.join(img_folder, t2))
 
@@ -91,7 +85,7 @@ def pre_process(group, data_folder, img_folder, target_folder, filter_percentage
         img_folder, "B"), target, percentage=filter_percentage)
 
 
-if __name__ == "__main__" :
-    pre_process("train", "train_data", "train_img" ,"img_data")
+if __name__ == "__main__":
+    pre_process("train", "train_data", "train_img", "img_data")
 
-    pre_process("test", "test_data", "test_img" ,"img_data")
+    pre_process("test", "test_data", "test_img", "img_data")
