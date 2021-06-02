@@ -37,8 +37,7 @@ if __name__ == "__main__":
 
     if(save_epoch_model == 1):
         for epoch in gan.train(epochs=e, batch_size=1, include_val=False, step_print=100):
-            folder = os.path.join("saved_epoch_models",
-                                  "saved_model_" + str(epoch))
+            folder = os.path.join(PWD,"saved_epoch_models","saved_model_" + str(epoch))
             make_dir([folder])
             print("Saving ..")
             gan.generator.save(os.path.join(
@@ -49,13 +48,15 @@ if __name__ == "__main__":
                 folder, "gan_model_" + str(epoch) + ".h5"))
 
             if(save_to_drive == 1):
+                upload_file = os.path.join(PWD,"saved_epoch_models",f"{tag}_part_{str(epoch)}.zip")
                 print("Models Uploading...")
-                make_archive(os.path.join(PWD,"saved_epoch_models"),os.path.join(PWD, f"{tag}_part_{str(epoch)}.zip"))
-                g.upload(os.path.join(PWD,"saved_epoch_models", f"{tag}_{str(epoch)}.zip"))
+                make_archive(folder,upload_file)
+                g.upload(upload_file)
     else:
         value = gan.train(epochs=e, batch_size=1, include_val=False, step_print=100)
 
-    folder = "saved_models"
+    folder = os.path.join(PWD,"saved_models")
+    upload_file = os.path.join(PWD, f"{tag}_saved_models.zip")
 
     print("Training complete. Saving ...")
 
@@ -66,5 +67,5 @@ if __name__ == "__main__":
     print("Models saved.")
 
     print("Models Uploading...")
-    make_archive(os.path.join(PWD,"saved_models"),os.path.join(PWD, f"{tag}_saved_models.zip"))
-    g.upload(os.path.join(PWD,"saved_models", f"{tag}_saved_models.zip"))
+    make_archive(folder,upload_file)
+    g.upload(upload_file)
