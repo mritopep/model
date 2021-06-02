@@ -50,10 +50,8 @@ if __name__ == "__main__":
 
             if(save_to_drive == 1):
                 print("Models Uploading...")
-                make_archive(folder, os.path.join(
-                    "saved_epoch_models", f"{tag}_part_{str(epoch)}.zip"))
-                g.upload(os.path.join("saved_epoch_models",
-                         f"{tag}_{str(epoch)}.zip"))
+                make_archive(os.path.join(PWD,"saved_epoch_models"),os.path.join(PWD, f"{tag}_part_{str(epoch)}.zip"))
+                g.upload(os.path.join(PWD,"saved_epoch_models", f"{tag}_{str(epoch)}.zip"))
     else:
         value = gan.train(epochs=e, batch_size=1, include_val=False, step_print=100)
 
@@ -68,6 +66,5 @@ if __name__ == "__main__":
     print("Models saved.")
 
     print("Models Uploading...")
-    PWD = str(os.getcwd())
     make_archive(os.path.join(PWD,"saved_models"),os.path.join(PWD, f"{tag}_saved_models.zip"))
-    g.upload(os.path.join(PWD, f"{tag}_saved_models.zip"))
+    g.upload(os.path.join(PWD,"saved_models", f"{tag}_saved_models.zip"))
