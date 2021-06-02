@@ -4,3 +4,4 @@ git+https://www.github.com/keras-team/keras-contrib.git
 scipy==1.1.0
 opencv-python
 med2image
+google-api-python-client
