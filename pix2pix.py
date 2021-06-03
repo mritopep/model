@@ -15,7 +15,7 @@ from data_loader import DataLoader
 import numpy as np
 import os
 from keras.layers import Subtract, Add
-from arch_util import gaussian_filter_block
+from arch_util import gaussian_filter_block,kernel_init,_gaussian_kernel
 
 
 class Pix2Pix():
@@ -214,7 +214,7 @@ class Pix2Pix():
 
             print("Avg. epoch loss :", "%.4f" % (el/c))
 
-            if(epoch%5==0):
+            if(epoch%10==0):
                 yield epoch
 
     def sample_images(self, samples=3, is_test=True):
