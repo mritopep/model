@@ -4,9 +4,10 @@ import scipy.stats as st
 from keras.layers import Layer
 import keras.backend as K
 from tensorflow.keras.layers import Dense, Lambda, Dot, Activation, Concatenate
-from tensorflow.keras.layers import Layer,InputLayer
+from tensorflow.keras.layers import Layer, InputLayer
 from keras.layers import Dense, Flatten, Reshape, Input, InputLayer
 from keras.models import Sequential, Model
+
 
 def gaussian_filter_block(input_layer,
                           kernel_size=3,
@@ -58,6 +59,29 @@ def gaussian_filter_block(input_layer,
         kernel_initializer=kernel_init)(input_layer)
 
 
+def _gaussian_kernel(kernlen=[21, 21], nsig=[3, 3]):
+        """
+        Returns a 2D Gaussian kernel array
+        """
+        assert len(nsig) == 2
+        assert len(kernlen) == 2
+        kern1d = []
+        for i in range(2):
+            interval = (2 * nsig[i] + 1.) / (kernlen[i])
+            x = np.linspace(-nsig[i] - interval / 2., nsig[i] + interval / 2.,
+                            kernlen[i] + 1)
+            kern1d.append(np.diff(st.norm.cdf(x)))
+
+        kernel_raw = np.sqrt(np.outer(kern1d[0], kern1d[1]))
+        # divide by sum so they all add up to 1
+        kernel = kernel_raw / kernel_raw.sum()
+        return kernel
+    
+def kernel_init(shape, dtype):
+        kernel = np.zeros(shape)
+        kernel[:, :, 0, 0] = _gaussian_kernel([shape[0], shape[1]])
+        return kernel
+
 # class attention(Layer):
 #     def __init__(self, **kwargs):
 #         super(attention, self).__init__(**kwargs)
@@ -84,7 +108,7 @@ def gaussian_filter_block(input_layer,
 
 # def get_config(self):
 #         return super(attention, self).get_config()
-    
+
 # def gaussian_glimpse(img_tensor, transform_params):
 #     # parse arguments
 #     h, w = (img_tensor.shape[1],img_tensor.shape[2])
@@ -124,6 +148,7 @@ def gaussian_filter_block(input_layer,
 #     normalised_mask = mask / (tf.reduce_sum(mask, 1, keep_dims=True) + 1e-8)
 #     return normalised_mask
 
+
 class Attention(Layer):
 
     def __init__(self, **kwargs):
@@ -133,13 +158,20 @@ class Attention(Layer):
         hidden_states = inputs
         hidden_size = hidden_states.shape
         flattened = Flatten()(hidden_states)
-        score_first_part = Dense(np.prod(hidden_size), use_bias=False, name='attention_score_vec')(flattened)
-        h_t = Lambda(lambda x: x[:, -1, :], output_shape=(hidden_size,), name='last_hidden_state')(flattened)
-        score = Dot(axes=[1, 2], name='attention_score')([h_t, score_first_part])
-        attention_weights = Activation('softmax', name='attention_weight')(score)
-        context_vector = Dot(axes=[1, 1], name='context_vector')([flattened, attention_weights])
-        pre_activation = Concatenate(name='attention_output')([context_vector, h_t])
-        attention_vector = Dense(np.prod(hidden_size), use_bias=False, activation='tanh', name='attention_vector')(pre_activation)
+        score_first_part = Dense(
+            np.prod(hidden_size), use_bias=False, name='attention_score_vec')(flattened)
+        h_t = Lambda(lambda x: x[:, -1, :], output_shape=(hidden_size,),
+                     name='last_hidden_state')(flattened)
+        score = Dot(axes=[1, 2], name='attention_score')(
+            [h_t, score_first_part])
+        attention_weights = Activation(
+            'softmax', name='attention_weight')(score)
+        context_vector = Dot(axes=[1, 1], name='context_vector')(
+            [flattened, attention_weights])
+        pre_activation = Concatenate(
+            name='attention_output')([context_vector, h_t])
+        attention_vector = Dense(np.prod(hidden_size), use_bias=False,
+                                 activation='tanh', name='attention_vector')(pre_activation)
         _output = Reshape(hidden_size)(attention_vector)
         return _output
 

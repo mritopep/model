@@ -4,6 +4,10 @@ import sys
 import os
 from general import make_dir, make_archive
 from gdrive import Gdrive
+from arch_util import gaussian_filter_block,kernel_init,_gaussian_kernel
+import keras
+import os.path as path
+from keras.utils import CustomObjectScope
 
 if __name__ == "__main__":
     tag = ""
@@ -30,6 +34,8 @@ if __name__ == "__main__":
 
     # tag to distungiush
     tag = f"{str(sys.argv[5])}_{e}" if len(sys.argv) > 5 else ""
+
+    
 
     if(save_dataset == 1):
         make_archive("img_data", f"{tag}_img_data.zip")
