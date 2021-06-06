@@ -214,7 +214,7 @@ class Pix2Pix():
 
             print("Avg. epoch loss :", "%.4f" % (el/c))
 
-            if(epoch!=0 and epoch%5==0):
+            if(epoch!=0 and epoch%3==0):
                 yield epoch
 
     def sample_images(self, samples=3, is_test=True):
