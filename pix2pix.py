@@ -102,24 +102,22 @@ class Pix2Pix():
         
         d0 = Input(shape=self.img_shape)
 
-        
-        d1 = conv2d(d0, self.gf, bn=False)
-        d2 = conv2d(d1, self.gf*2)
-        d3 = conv2d(d2, self.gf*4)
-        d4 = conv2d(d3, self.gf*8)
-        d5 = conv2d(d4, self.gf*8)
-        d6 = conv2d(d5, self.gf*8)
-        d7 = conv2d(d6, self.gf*8)
+        d1 = conv2d(d0, self.gf, bn=True)  # 64
+        d2 = conv2d(d1, self.gf*2, bn=True)  # 128
+        d3 = conv2d(d2, self.gf*4, bn=True)  # 256
+        d4 = conv2d(d3, self.gf*8, bn=True)  # 512
+        d5 = conv2d(d4, self.gf*8, bn=True)  # 512
+        d6 = conv2d(d5, self.gf*8, bn=True)  # 512
+        d7 = conv2d(d6, self.gf*8, bn=True)  # 512
 
-
-        u1 = deconv2d(d7, d6, self.gf*8)
-        u2 = deconv2d(u1, d5, self.gf*8)
-        u3 = deconv2d(u2, d4, self.gf*8)
-        u4 = deconv2d(u3, d3, self.gf*4)
-        u5 = deconv2d(u4, d2, self.gf*2)
-        u6 = deconv2d(u5, d1, self.gf)
-
+        u1 = deconv2d(d7, self.gf*8, skip_input=d6)  # 512
+        u2 = deconv2d(u1, self.gf*16, skip_input=d5)  # 1024
+        u3 = deconv2d(u2, self.gf*16, skip_input=d4)  # 1024
+        u4 = deconv2d(u3, self.gf*8, skip_input=d3)  # 512
+        u5 = deconv2d(u4, self.gf*4, skip_input=d2)  # 256
+        u6 = deconv2d(u5, self.gf*2, skip_input=d1)  # 128
         u7 = UpSampling2D(size=2)(u6)
+
         output_img = Conv2D(self.channels, kernel_size=4,
                             strides=1, padding='same', activation='tanh')(u7)
 
