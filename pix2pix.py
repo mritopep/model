@@ -156,7 +156,9 @@ class Pix2Pix():
         fake = np.zeros((batch_size,) + self.disc_patch)
 
         sp = 1
-        gen_loss = 0
+        gen_loss_1 = 0
+        gen_loss_2 = 0
+        
         disc_loss_1 = 0
         disc_loss_2 = 0
 
