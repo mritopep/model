@@ -169,7 +169,8 @@ class Pix2Pix():
         fake = np.zeros((batch_size,) + self.disc_patch)
 
         sp = 1
-        gen_loss = 0
+        gen_loss_1 = 0
+        gen_loss_2 = 0
         disc_loss_1 = 0
         disc_loss_2 = 0
 
@@ -195,18 +196,22 @@ class Pix2Pix():
                 el += g_loss[0]
                 c += 1
 
-                gen_loss += g_loss[0]
+                gen_loss_1 += g_loss[0]
+                gen_loss_2 += g_loss[1]
                 disc_loss_2 += d_loss[1]
                 disc_loss_1 += d_loss[0]
 
                 if sp % step_print == 0:
-                    print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f, acc: %3d%%] [G loss: %f] time: %s" % (epoch, epochs,
+                    print("[Epoch %d/%d] [Batch %d/%d] [D loss: %f, acc: %3d%%] [G loss: %f, acc: %3d%%] time: %s" % (epoch, epochs,
                                                                                                           batch_i, self.data_loader.n_batches,
-                                                                                                          disc_loss_1 / step_print, 100 *
-                                                                                                          disc_loss_2 / step_print,
+                                                                                                          disc_loss_1 / step_print, 
+                                                                                                          100 * disc_loss_2 / step_print,
+                                                                                                          gen_loss_1 / step_print, 
+                                                                                                          100 * gen_loss_2 / step_print,
                                                                                                           gen_loss / step_print,
                                                                                                           elapsed_time))
-                    gen_loss = 0
+                    gen_loss_1 = 0
+                    gen_loss_2 = 0
                     disc_loss_2 = 0
                     disc_loss_1 = 0
 
