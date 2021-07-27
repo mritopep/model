@@ -208,7 +208,6 @@ class Pix2Pix():
                                                                                                           100 * disc_loss_2 / step_print,
                                                                                                           gen_loss_1 / step_print, 
                                                                                                           100 * gen_loss_2 / step_print,
-                                                                                                          gen_loss / step_print,
                                                                                                           elapsed_time))
                     gen_loss_1 = 0
                     gen_loss_2 = 0
